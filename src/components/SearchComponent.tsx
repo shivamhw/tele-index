@@ -6,6 +6,19 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 
 const DOWNLOAD_BASE_URL = process.env.REACT_APP_DOWNLOAD_BASE_URL || 'http://localhost:8080';
 
+// Helper to format bytes to MB/GB
+function formatBytes(bytes: number): string {
+  if (bytes >= 1024 * 1024 * 1024) {
+    return (bytes / (1024 * 1024 * 1024)).toFixed(2) + ' GB';
+  } else if (bytes >= 1024 * 1024) {
+    return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+  } else if (bytes >= 1024) {
+    return (bytes / 1024).toFixed(2) + ' KB';
+  } else {
+    return bytes + ' B';
+  }
+}
+
 const SearchComponent: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const initialQuery = searchParams.get('q') || '';
@@ -107,7 +120,7 @@ const SearchComponent: React.FC = () => {
         <div className="result-meta">
           <span className="result-id">ID: {result.id}</span>
           {result.source.Size && (
-            <span className="result-size">Size: {result.source.Size}</span>
+            <span className="result-size">Size: {formatBytes(Number(result.source.Size))}</span>
           )}
           {result.source.File && (
             <span className="result-file">File: {result.source.File}</span>
