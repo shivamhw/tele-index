@@ -4,12 +4,17 @@ A modern React-based web application for searching through the tele index using 
 
 ## Features
 
-- 🔍 **Advanced Search**: Search through the tele index with full-text search capabilities
-- 🎨 **Modern UI**: Beautiful, responsive design with gradient backgrounds and smooth animations
-- 📄 **Pagination**: Navigate through search results with pagination controls
-- ✨ **Highlighting**: Search terms are highlighted in the results
-- 📱 **Responsive**: Works perfectly on desktop, tablet, and mobile devices
-- ⚡ **Real-time**: Instant search results with loading states and error handling
+- 🔍 **Advanced Search**: Full-text search through the tele index with highlighting
+- 📄 **Pagination**: Navigate through search results with easy pagination controls
+- 📥 **Download**: Download files directly from search results
+- 📺 **Stream**: Stream video/audio files in-browser with a modern player page
+- 🌐 **URL State**: Search query and page are reflected in the URL, so results persist with browser navigation and can be shared
+- 📱 **Responsive Design**: Fully mobile-friendly; buttons and scores stack for easy use on phones
+- 🎨 **Modern UI**: Beautiful, responsive design with gradients, cards, and smooth animations
+- ⚡ **Real-time Feedback**: Loading spinners and error messages for a smooth user experience
+- 🧭 **Back/Forward Support**: Use browser back/forward to return to previous searches and results
+- 🔗 **Direct Links**: Shareable URLs for any search and result page
+- 🛠️ **Configurable API**: Easily change API endpoint and search parameters
 
 ## Prerequisites
 
