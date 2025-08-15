@@ -1,0 +1,1 @@
+curl -X PUT http://localhost:8095/api/tele -d @index.json
