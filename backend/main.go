@@ -33,6 +33,8 @@ var (
 	login                  = flag.Bool("login", false, "enable telegram login")
 	phone                  = flag.String("phone", "", "phone number for telegram login")
 	otp                    = flag.String("otp", "", "otp for telegram login")
+	migrateDB              = flag.String("migrateDB", "", "path to the database to migrate")
+	exportFile			  = flag.String("exportFile", "", "path to the export file for migration")
 	dataDir                = flag.String("dataDir", "data", "data directory")
 	staticEtag             = flag.String("staticEtag", "", "optional static etag value.")
 	staticPath             = flag.String("static", "", "optional path to static directory for web resources")
@@ -41,6 +43,10 @@ var (
 
 func main() {
 	flag.Parse()
+	if *migrateDB != "" {
+		migrateJson(*migrateDB, *exportFile)
+		return
+	}
 	if *login {
 		if *phone == "" {
 			log.Fatal("phone number is required for login")
