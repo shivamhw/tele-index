@@ -72,7 +72,7 @@ const SearchComponent: React.FC = () => {
 
   // Updated renderResult for your API's hit structure
   const renderResult = (result: SearchResult) => {
-    const fromID = result.source.PeerID;
+    const fromID = result.source.ChatId;
     const fileID = result.source.ID;
     const downloadUrl =
       fromID && fileID ? `${DOWNLOAD_BASE_URL}/${fromID}/${fileID}` : null;

@@ -10,6 +10,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"log"
 	"net/http"
@@ -29,6 +30,9 @@ import (
 
 var (
 	bindAddr               = flag.String("addr", ":8095", "http listen address")
+	login                  = flag.Bool("login", false, "enable telegram login")
+	phone                  = flag.String("phone", "", "phone number for telegram login")
+	otp                    = flag.String("otp", "", "otp for telegram login")
 	dataDir                = flag.String("dataDir", "data", "data directory")
 	staticEtag             = flag.String("staticEtag", "", "optional static etag value.")
 	staticPath             = flag.String("static", "", "optional path to static directory for web resources")
@@ -37,7 +41,14 @@ var (
 
 func main() {
 	flag.Parse()
-
+	if *login {
+		if *phone == "" {
+			log.Fatal("phone number is required for login")
+			return
+		}
+		bleveHttp.LoginTelegram(*phone, *otp)
+		return
+	}
 	// walk the data dir and register index names
 	dirEntries, err := os.ReadDir(*dataDir)
 	if err != nil {
@@ -147,6 +158,10 @@ func main() {
 
 	aliasHandler := bleveHttp.NewAliasHandler()
 	router.Handle("/api/_aliases", aliasHandler).Methods("POST")
+
+	bleveHttp.InitTelegramClient(*phone)
+	streamHandler := bleveHttp.StreamHandler(context.Background())
+	router.Handle("/{peer}/{message:[0-9]+}", streamHandler).Methods("GET")
 
 	cors := handlers.CORS(
 		handlers.AllowedOrigins([]string{"*"}), // or []string{"*"} (no creds)
