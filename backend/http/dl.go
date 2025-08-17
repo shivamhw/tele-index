@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strconv"
 	"sync"
+	"time"
 
 	"github.com/go-faster/errors"
 	"github.com/gorilla/mux"
@@ -15,7 +16,9 @@ import (
 	"github.com/gotd/contrib/tg_io"
 	"github.com/gotd/td/tg"
 
+	"github.com/iyear/tdl/core/dcpool"
 	"github.com/iyear/tdl/core/logctx"
+	"github.com/iyear/tdl/core/tclient"
 	"github.com/iyear/tdl/core/tmedia"
 	"github.com/shivamhw/content-pirate/pkg/log"
 	"github.com/shivamhw/content-pirate/pkg/telegram"
@@ -94,14 +97,17 @@ func StreamHandler(ctx context.Context) http.Handler {
 
 			cache.Store(peer+messageStr, item)
 		}
+		pool := dcpool.NewPool(tClient.GetClient(),
+			int64(8),
+			tclient.NewDefaultMiddlewares(ctx, 10*time.Second)...)
 
-		api := tClient.GetClient()
+		api := pool.Client(ctx, item.DC)
 		
 
 		w.Header().Set("Connection", "keep-alive")
 
 		u := partio.NewStreamer(
-			tg_io.NewDownloader(api.API()).ChunkSource(item.Size, item.InputFileLoc),
+			tg_io.NewDownloader(api).ChunkSource(item.Size, item.InputFileLoc),
 			int64(512*1024))
 
 		w.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename="%s"`, item.Name))
