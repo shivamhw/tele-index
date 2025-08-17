@@ -31,6 +31,7 @@ type media struct {
 
 var (
 	tClient *telegram.Telegram
+	pool    dcpool.Pool
 )
 
 func LoginTelegram(phone string, otp string) error {
@@ -69,6 +70,9 @@ func InitTelegramClient(phone string) error {
 
 	tClient = t
 	log.Infof("Telegram client initialized successfully with phone: %s", phone)
+	pool = dcpool.NewPool(tClient.GetClient(),
+		int64(8),
+		tclient.NewDefaultMiddlewares(ctx, 10*time.Second)...)
 	return nil
 }
 
@@ -97,12 +101,9 @@ func StreamHandler(ctx context.Context) http.Handler {
 
 			cache.Store(peer+messageStr, item)
 		}
-		pool := dcpool.NewPool(tClient.GetClient(),
-			int64(8),
-			tclient.NewDefaultMiddlewares(ctx, 10*time.Second)...)
+
 
 		api := pool.Client(ctx, item.DC)
-		
 
 		w.Header().Set("Connection", "keep-alive")
 
