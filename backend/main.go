@@ -123,9 +123,9 @@ func main() {
 	getIndexHandler.IndexNameLookup = indexNameLookup
 	router.Handle("/api/{indexName}", getIndexHandler).Methods("GET")
 
-	deleteIndexHandler := bleveHttp.NewDeleteIndexHandler(*dataDir)
-	deleteIndexHandler.IndexNameLookup = indexNameLookup
-	router.Handle("/api/{indexName}", deleteIndexHandler).Methods("DELETE")
+	// deleteIndexHandler := bleveHttp.NewDeleteIndexHandler(*dataDir)
+	// deleteIndexHandler.IndexNameLookup = indexNameLookup
+	// router.Handle("/api/{indexName}", deleteIndexHandler).Methods("DELETE")
 
 	listIndexesHandler := bleveHttp.NewListIndexesHandler()
 	router.Handle("/api", listIndexesHandler).Methods("GET")
@@ -144,10 +144,10 @@ func main() {
 	docGetHandler.DocIDLookup = docIDLookup
 	router.Handle("/api/{indexName}/{docID}", docGetHandler).Methods("GET")
 
-	docDeleteHandler := bleveHttp.NewDocDeleteHandler("")
-	docDeleteHandler.IndexNameLookup = indexNameLookup
-	docDeleteHandler.DocIDLookup = docIDLookup
-	router.Handle("/api/{indexName}/{docID}", docDeleteHandler).Methods("DELETE")
+	// docDeleteHandler := bleveHttp.NewDocDeleteHandler("")
+	// docDeleteHandler.IndexNameLookup = indexNameLookup
+	// docDeleteHandler.DocIDLookup = docIDLookup
+	// router.Handle("/api/{indexName}/{docID}", docDeleteHandler).Methods("DELETE")
 
 	searchHandler := bleveHttp.NewSearchHandler("")
 	searchHandler.IndexNameLookup = indexNameLookup
