@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { searchTele } from '../services/searchService';
 import { SearchResult } from '../types/search';
 import './SearchComponent.css';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { searchTMDB, TMDBSuggestion } from '../services/tmdbService';
 
 const DOWNLOAD_BASE_URL = process.env.REACT_APP_DOWNLOAD_BASE_URL || 'http://localhost:8080';
 
@@ -28,17 +29,65 @@ const SearchComponent: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(initialPage);
+  const [suggestions, setSuggestions] = useState<TMDBSuggestion[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [selected, setSelected] = useState<{
+    mediaType: 'movie' | 'tv' | null;
+    title: string | null;
+    year?: number;
+    posterPath?: string;
+  }>({ mediaType: null, title: null, year: undefined, posterPath: undefined });
+  const [movieYear, setMovieYear] = useState<number | ''>('');
+  const [tvSeason, setTvSeason] = useState<number | ''>('');
+  const [tvEpisode, setTvEpisode] = useState<number | ''>('');
+  const [hasSearched, setHasSearched] = useState(false);
+  const [lastSearchedQuery, setLastSearchedQuery] = useState('');
   const navigate = useNavigate();
 
-  // On mount, if query param exists, trigger search
+  // Do not auto-search on mount; user must click Search
   React.useEffect(() => {
-    if (initialQuery) {
-      handleSearch(initialQuery, initialPage);
-    }
+    // Keep query string in input if provided via URL, but don't trigger search automatically
     // eslint-disable-next-line
   }, []);
 
-  const handleSearch = async (searchQuery: string = query, page: number = 1) => {
+  // Debounced TMDB autocomplete
+  React.useEffect(() => {
+    const q = query.trim();
+    if (!q || q.length < 2) {
+      setSuggestions([]);
+      return;
+    }
+    const id = setTimeout(async () => {
+      const res = await searchTMDB(q);
+      setSuggestions(res);
+      setShowSuggestions(true);
+    }, 300);
+    return () => clearTimeout(id);
+  }, [query]);
+
+  const pad2 = (n: number) => String(n).padStart(2, '0');
+
+  const composedQuery = useMemo(() => {
+    if (selected.mediaType === 'movie' && selected.title) {
+      const year = movieYear || selected.year;
+      return year ? `${selected.title} ${year}` : `${selected.title}`;
+    }
+    if (selected.mediaType === 'tv' && selected.title) {
+      const s = typeof tvSeason === 'number' ? tvSeason : Number(tvSeason);
+      const e = typeof tvEpisode === 'number' ? tvEpisode : Number(tvEpisode);
+      if (s && e) return `${selected.title} s${pad2(s)}e${pad2(e)}`;
+      if (s) return `${selected.title} s${pad2(s)}`;
+      return selected.title;
+    }
+    return query;
+  }, [selected, movieYear, tvSeason, tvEpisode, query]);
+
+  const posterUrl = useMemo(() => {
+    if (!selected.posterPath) return '';
+    return `https://image.tmdb.org/t/p/w154${selected.posterPath}`;
+  }, [selected.posterPath]);
+
+  const handleSearch = async (searchQuery: string = composedQuery || query, page: number = 1) => {
     if (!searchQuery.trim()) {
       setError('Please enter a search query');
       setResults([]);
@@ -48,6 +97,8 @@ const SearchComponent: React.FC = () => {
     }
     setLoading(true);
     setError(null);
+    setHasSearched(true);
+    setLastSearchedQuery(searchQuery);
     setSearchParams({ q: searchQuery, page: String(page) });
     try {
       const searchResults = await searchTele(searchQuery, page);
@@ -63,11 +114,11 @@ const SearchComponent: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    handleSearch(query, 1);
+    handleSearch(composedQuery || query, 1);
   };
 
   const handlePageChange = (newPage: number) => {
-    handleSearch(query, newPage);
+    handleSearch(lastSearchedQuery || composedQuery || query, newPage);
   };
 
   // Updated renderResult for your API's hit structure
@@ -133,17 +184,49 @@ const SearchComponent: React.FC = () => {
   return (
     <div className="search-container">
       <div className="search-header">
-        <h1>Tele Search</h1>
+        <h1>
+          <a
+            href="/"
+            className="brand-link"
+            onClick={(e) => {
+              e.preventDefault();
+              setQuery('');
+              setResults([]);
+              setHasSearched(false);
+              setLastSearchedQuery('');
+              setError(null);
+              setCurrentPage(1);
+              setSelected({ mediaType: null, title: null, year: undefined, posterPath: undefined });
+              setMovieYear('');
+              setTvSeason('');
+              setTvEpisode('');
+              setSuggestions([]);
+              setShowSuggestions(false);
+              setSearchParams({});
+              navigate('/', { replace: true });
+            }}
+          >
+            Tele Search
+          </a>
+        </h1>
         <p>Search through the tele index with advanced querying</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="search-form">
+      <form onSubmit={handleSubmit} className="search-form" autoComplete="off">
         <div className="search-input-group">
           <input
             type="text"
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Enter your search query (e.g., 'housefull 5a')"
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setSelected({ mediaType: null, title: null, year: undefined, posterPath: undefined });
+              setMovieYear('');
+              setTvSeason('');
+              setTvEpisode('');
+              setHasSearched(false);
+            }}
+            onFocus={() => suggestions.length && setShowSuggestions(true)}
+            placeholder="Search movies or series (e.g., 'Wanted', 'Game of Thrones')"
             className="search-input"
             disabled={loading}
           />
@@ -151,6 +234,80 @@ const SearchComponent: React.FC = () => {
             {loading ? 'Searching...' : 'Search'}
           </button>
         </div>
+
+        {showSuggestions && suggestions.length > 0 && (
+          <div className="suggestions" onMouseLeave={() => setShowSuggestions(false)}>
+            {suggestions.slice(0, 8).map((sug) => (
+              <div
+                key={`${sug.mediaType}-${sug.id}`}
+                className="suggestion-item"
+                onClick={() => {
+                  setQuery(sug.title);
+                  setSelected({ mediaType: sug.mediaType, title: sug.title, year: sug.year, posterPath: sug.posterPath });
+                  if (sug.mediaType === 'movie') {
+                    setMovieYear(sug.year || '');
+                  } else {
+                    setTvSeason('');
+                    setTvEpisode('');
+                  }
+                  setShowSuggestions(false);
+                }}
+              >
+                {sug.posterPath ? (
+                  <img
+                    className="suggestion-thumb"
+                    src={`https://image.tmdb.org/t/p/w92${sug.posterPath}`}
+                    alt={sug.title}
+                  />
+                ) : (
+                  <span className="suggestion-type">{sug.mediaType === 'movie' ? '🎬' : '📺'}</span>
+                )}
+                <span className="suggestion-title">{sug.title}</span>
+                {sug.year ? <span className="suggestion-year">({sug.year})</span> : null}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {selected.mediaType === 'movie' && (
+          <div className="refine-row">
+            <label className="refine-label">Release year</label>
+            <input
+              type="number"
+              min={1900}
+              max={3000}
+              placeholder="e.g., 2008"
+              value={movieYear}
+              onChange={(e) => setMovieYear(e.target.value ? Number(e.target.value) : '')}
+              className="refine-input"
+            />
+            <div className="composed-preview">Query: {composedQuery}</div>
+          </div>
+        )}
+
+        {selected.mediaType === 'tv' && (
+          <div className="refine-row">
+            <label className="refine-label">Season</label>
+            <input
+              type="number"
+              min={1}
+              placeholder="e.g., 1"
+              value={tvSeason}
+              onChange={(e) => setTvSeason(e.target.value ? Number(e.target.value) : '')}
+              className="refine-input"
+            />
+            <label className="refine-label">Episode</label>
+            <input
+              type="number"
+              min={1}
+              placeholder="e.g., 2"
+              value={tvEpisode}
+              onChange={(e) => setTvEpisode(e.target.value ? Number(e.target.value) : '')}
+              className="refine-input"
+            />
+            <div className="composed-preview">Query: {composedQuery}</div>
+          </div>
+        )}
       </form>
 
       {error && (
@@ -195,9 +352,9 @@ const SearchComponent: React.FC = () => {
         </div>
       )}
 
-      {!loading && !error && results.length === 0 && query && (
+      {!loading && !error && hasSearched && results.length === 0 && (
         <div className="no-results">
-          <p>No results found for "{query}"</p>
+          <p>No results found for "{lastSearchedQuery}"</p>
           <p>Try adjusting your search terms or check your spelling.</p>
         </div>
       )}

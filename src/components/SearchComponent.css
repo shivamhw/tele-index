@@ -21,6 +21,11 @@
   background-clip: text;
 }
 
+.brand-link {
+  text-decoration: none;
+  color: inherit;
+}
+
 .search-header p {
   font-size: 1.1rem;
   color: #666;
@@ -36,6 +41,76 @@
   gap: 1rem;
   max-width: 600px;
   margin: 0 auto;
+}
+
+.suggestions {
+  position: relative;
+  max-width: 600px;
+  margin: 0.5rem auto 1rem;
+  border: 1px solid #e1e5e9;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+  overflow: hidden;
+}
+
+.suggestion-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+}
+
+.suggestion-item:hover {
+  background: #f8f9fa;
+}
+
+.suggestion-type {
+  width: 1.5rem;
+}
+
+.suggestion-title {
+  font-weight: 600;
+}
+
+.suggestion-year {
+  color: #666;
+  margin-left: auto;
+}
+
+.suggestion-thumb {
+  width: 46px;
+  height: 69px;
+  object-fit: cover;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+.refine-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  max-width: 600px;
+  margin: 0.25rem auto 0.75rem;
+}
+
+.refine-label {
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.refine-input {
+  width: 120px;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #e1e5e9;
+  border-radius: 8px;
+}
+
+.composed-preview {
+  margin-left: auto;
+  font-size: 0.9rem;
+  color: #666;
 }
 
 .search-input {
@@ -198,6 +273,16 @@
   font-weight: 600;
   color: #1a1a1a;
   line-height: 1.4;
+}
+
+.result-title .result-thumb {
+  width: 60px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-right: 0.75rem;
+  vertical-align: middle;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
 }
 
 .result-score {
