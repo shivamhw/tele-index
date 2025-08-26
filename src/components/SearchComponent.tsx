@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { searchTele } from '../services/searchService';
+import { searchTele, getTeleCount } from '../services/searchService';
 import { SearchResult } from '../types/search';
 import './SearchComponent.css';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -48,6 +48,15 @@ const SearchComponent: React.FC = () => {
   React.useEffect(() => {
     // Keep query string in input if provided via URL, but don't trigger search automatically
     // eslint-disable-next-line
+  }, []);
+
+  // Fetch and show total indexed count on mount
+  const [teleCount, setTeleCount] = useState<number | null>(null);
+  React.useEffect(() => {
+    (async () => {
+      const c = await getTeleCount();
+      setTeleCount(c);
+    })();
   }, []);
 
   // Debounced TMDB autocomplete
@@ -209,7 +218,7 @@ const SearchComponent: React.FC = () => {
             Tele Search
           </a>
         </h1>
-        <p>Search through the tele index with advanced querying</p>
+        <p>{teleCount !== null ? `Search through ${teleCount.toLocaleString()} files` : 'Search through the tele index'}</p>
       </div>
 
       <form onSubmit={handleSubmit} className="search-form" autoComplete="off">

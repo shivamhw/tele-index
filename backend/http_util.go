@@ -20,8 +20,8 @@ import (
 
 func staticFileRouter(r *mux.Router, static http.Handler) *mux.Router {
 	// static
-	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/",
-		myFileHandler{static}))
+	r.PathPrefix("/static/").Handler(
+		myFileHandler{static})
 	// bootstrap ui insists on loading templates from this path
 	r.PathPrefix("/template/").Handler(http.StripPrefix("/template/",
 		myFileHandler{static}))
@@ -40,7 +40,7 @@ func staticFileRouter(r *mux.Router, static http.Handler) *mux.Router {
 		r.PathPrefix(p).Handler(RewriteURL("/", static))
 	}
 
-	r.Handle("/", http.RedirectHandler("/static/index.html", http.StatusFound))
+	r.Handle("/", static)
 
 	return r
 }

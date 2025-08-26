@@ -39,3 +39,14 @@ export const searchTele = async (query: string, page: number = 1, size: number =
     throw error;
   }
 }; 
+
+export const getTeleCount = async (): Promise<number> => {
+  try {
+    const response = await searchApi.get<{ status: string; count: number }>(`/api/tele/_count`);
+    const count = typeof response.data?.count === 'number' ? response.data.count : 0;
+    return count;
+  } catch (error) {
+    console.error('Count API error:', error);
+    return 0;
+  }
+};
