@@ -79,6 +79,23 @@
   margin-left: auto;
 }
 
+.media-badge {
+  margin-left: 0.5rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #fff;
+  white-space: nowrap;
+}
+.media-badge.movie {
+  background: linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%);
+}
+.media-badge.tv {
+  background: linear-gradient(135deg, #43cea2 0%, #185a9d 100%);
+}
+
 .suggestion-thumb {
   width: 46px;
   height: 69px;
@@ -108,7 +125,9 @@
 }
 
 .composed-preview {
-  margin-left: auto;
+  max-width: 600px;
+  margin: 0.5rem auto 0;
+  text-align: center;
   font-size: 0.9rem;
   color: #666;
 }

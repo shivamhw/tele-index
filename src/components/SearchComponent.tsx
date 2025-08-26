@@ -243,6 +243,7 @@ const SearchComponent: React.FC = () => {
             {loading ? 'Searching...' : 'Search'}
           </button>
         </div>
+        <div className="composed-preview">Query: {composedQuery}</div>
 
         {showSuggestions && suggestions.length > 0 && (
           <div className="suggestions" onMouseLeave={() => setShowSuggestions(false)}>
@@ -272,6 +273,9 @@ const SearchComponent: React.FC = () => {
                   <span className="suggestion-type">{sug.mediaType === 'movie' ? '🎬' : '📺'}</span>
                 )}
                 <span className="suggestion-title">{sug.title}</span>
+                <span className={`media-badge ${sug.mediaType}`}>
+                  {sug.mediaType === 'movie' ? 'Movie' : 'Series'}
+                </span>
                 {sug.year ? <span className="suggestion-year">({sug.year})</span> : null}
               </div>
             ))}
@@ -290,7 +294,6 @@ const SearchComponent: React.FC = () => {
               onChange={(e) => setMovieYear(e.target.value ? Number(e.target.value) : '')}
               className="refine-input"
             />
-            <div className="composed-preview">Query: {composedQuery}</div>
           </div>
         )}
 
@@ -314,7 +317,6 @@ const SearchComponent: React.FC = () => {
               onChange={(e) => setTvEpisode(e.target.value ? Number(e.target.value) : '')}
               className="refine-input"
             />
-            <div className="composed-preview">Query: {composedQuery}</div>
           </div>
         )}
       </form>
