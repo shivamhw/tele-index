@@ -25,3 +25,6 @@ data
 data_bkp
 teleData
 tele-backend
+tele-index
+.env
+.env

@@ -1,2 +1,2 @@
 build:
-	go build -o tele-backend 
+	go build -o tele-index 
