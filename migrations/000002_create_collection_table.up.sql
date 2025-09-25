@@ -1,0 +1,9 @@
+CREATE TABLE IF NOT EXISTS collections (
+    id VARCHAR(256) PRIMARY KEY,
+    name TEXT,
+    description TEXT,
+    owner VARCHAR(256),
+    sharedwith TEXT,
+    createon DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (owner) REFERENCES users(id) ON DELETE SET NULL
+);

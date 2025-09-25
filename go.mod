@@ -17,8 +17,10 @@ require (
 	github.com/blevesearch/zap/v15 v15.0.3 // indirect
 	github.com/couchbase/vellum v1.0.2 // indirect
 	github.com/glycerine/go-unsnap-stream v0.0.0-20181221182339-f9677308dec2 // indirect
+	github.com/golang-migrate/migrate v3.5.4+incompatible // indirect
 	github.com/golang/protobuf v1.5.0 // indirect
 	github.com/golang/snappy v0.0.1 // indirect
+	github.com/mattn/go-sqlite3 v1.14.32 // indirect
 	github.com/mschoch/smat v0.2.0 // indirect
 	github.com/philhofer/fwd v1.0.0 // indirect
 	github.com/steveyen/gtreap v0.1.0 // indirect
