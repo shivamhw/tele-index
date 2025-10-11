@@ -3,7 +3,6 @@ CREATE TABLE IF NOT EXISTS collections (
     name TEXT,
     description TEXT,
     owner VARCHAR(256),
-    sharedwith TEXT,
-    createon DATETIME DEFAULT CURRENT_TIMESTAMP,
+    createdOn DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (owner) REFERENCES users(id) ON DELETE SET NULL
 );

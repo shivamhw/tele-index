@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS users (
     id VARCHAR(256) PRIMARY KEY,
     username VARCHAR(256) UNIQUE NOT NULL, 
-    teleid   BIGINT,
+    teleId  BIGINT UNIQUE,
     createdOn DATETIME DEFAULT CURRENT_TIMESTAMP,
     password TEXT NOT NULL
 );

@@ -17,13 +17,18 @@ type CollectionModel struct {
 	Name        string
 	Description string
 	Owner       string
-	SharedWith  []string
 	CreatedOn   time.Time
 }
 
 type Collection_ItemModel struct {
 	ColId	string
 	ItemId	string
+}
+
+type Collection_UserModel struct {
+	ColId	string
+	UserId	string
+	Permission int
 }
 
 type ItemModel struct {
