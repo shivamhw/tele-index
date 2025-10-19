@@ -43,6 +43,15 @@ func (s *SqlDB) CreateUser(u models.UserModel) (string, error) {
 	return u.Id, nil
 }
 
+
+func (s *SqlDB) GetUserById(id string) (u models.UserModel, err error) {
+	err = s.Db.QueryRowContext(context.Background(), "SELECT * from users where id = ?", id).Scan(&u.Id, &u.UserName, &u.TeleId, &u.CreateOn, &u.Password)
+	if err != nil && strings.Contains(err.Error(), "sql: no rows in result ") {
+		return u, ErrUserNotFound
+	}
+	return
+}
+
 func (s *SqlDB) GetUserByUsername(username string) (u models.UserModel, err error) {
 	err = s.Db.QueryRowContext(context.Background(), "SELECT * from users where username = ?", username).Scan(&u.Id, &u.UserName, &u.TeleId, &u.CreateOn, &u.Password)
 	if err != nil && strings.Contains(err.Error(), "sql: no rows in result ") {
@@ -71,6 +80,7 @@ func (s *SqlDB) GetCollectionById(id string) (c models.CollectionModel, err erro
 	}
 	return
 }
+
 
 func (s *SqlDB) GetCollectionsForUser(owner_id string) (cols []models.CollectionModel, err error) {
 	res, err := s.Db.QueryContext(context.Background(), "SELECT *  FROM collections where owner = ?", owner_id)
@@ -133,5 +143,17 @@ func (s *SqlDB) AddUserToCollection(userId string, colId string) error {
 		return err
 	}
 	log.InfoF("successfully added user to col", "user", userId, "col", colId, "res", res)
+	return nil
+}
+
+func (s *SqlDB) AddTelegramToUser(userId string, teleId int64) error {
+	res, err := s.Db.ExecContext(context.Background(), "UPDATE users SET teleId = ? WHERE id = ?", teleId, userId)
+	if err != nil {
+		if strings.Contains(err.Error(), "UNIQUE constraint failed: users.teleId") {
+			return ErrTeleIdAlreadyExists
+		}
+		return err
+	}
+	log.InfoF("successfully added telegram to user", "user", userId, "teleId", teleId, "res", res)
 	return nil
 }

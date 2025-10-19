@@ -37,5 +37,6 @@ type ItemModel struct {
 	From      int64
 	ChatID    int64
 	FileName  string
+	Size 	int64
 	CreatedOn time.Time
 }
